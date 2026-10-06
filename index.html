@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#168fe5">
+<title>English World</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#17324d;background:#eaf6ff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(#bfe8ff,#edf8ff 36%,#f6fbff)}
+button,input,select{font:inherit}.app{max-width:680px;margin:auto;min-height:100vh;padding:14px 14px 100px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:4px 0 12px}.brand{font-weight:900;font-size:25px}.sub{font-size:12px;color:#557}
+.pills{display:flex;gap:7px}.pill{background:#fff;padding:8px 11px;border-radius:18px;box-shadow:0 3px 12px #1232;font-weight:800}
+.card{background:#fff;border-radius:22px;padding:17px;margin:12px 0;box-shadow:0 5px 18px #2352}
+.hero{background:linear-gradient(145deg,#168fe5,#43b5f6);color:#fff}.hero h2{margin:0 0 5px;font-size:25px}.hero p{margin:4px 0 15px}
+.btn{border:0;border-radius:15px;padding:13px 14px;font-weight:800;background:#e9f4fc;color:#17324d}.primary{background:#31bd57;color:white}.wide{width:100%}.secondary{background:#fff;color:#1675b9}
+.progress{height:12px;background:#dfeaf1;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:#31bd57}
+.map{position:relative;height:315px;border-radius:24px;overflow:hidden;background:linear-gradient(#76cef5 0 62%,#2faee9 62%);box-shadow:inset 0 0 0 2px #fff8}
+.continent{position:absolute;background:#91d85e;border:4px solid #e8ffd9;border-radius:50%;box-shadow:0 5px 10px #0754;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;color:#194d27;font-size:12px;padding:4px}
+.eu{width:100px;height:72px;left:48%;top:26%}.af{width:105px;height:120px;left:45%;top:47%}.as{width:145px;height:100px;right:4%;top:25%}.na{width:130px;height:105px;left:4%;top:24%}.sa{width:75px;height:125px;left:25%;top:57%}.au{width:88px;height:62px;right:9%;bottom:13%}
+.flagpins{position:absolute;font-size:27px;filter:drop-shadow(0 2px 2px #0004)}.p1{left:53%;top:30%}.p2{left:49%;top:36%}.p3{left:58%;top:35%}
+.sectionTitle{display:flex;justify-content:space-between;align-items:center}.sectionTitle h2{margin:0}.small{font-size:13px;color:#647789}
+.hidden{display:none!important}.answers{display:grid;gap:10px}.question{font-size:36px;font-weight:900;text-align:center;padding:25px 8px}.toast{text-align:center;min-height:28px;font-weight:900;margin:8px}
+.countryGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.country{background:#f6fbff;border-radius:16px;padding:10px 6px;text-align:center;min-height:105px}.country .flag{font-size:38px}.locked{filter:grayscale(1);opacity:.5}.country b{display:block;font-size:12px}.country small{font-size:10px}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.medal{text-align:center;background:#f4f9fc;border-radius:15px;padding:12px 5px;font-size:12px}.medal span{font-size:34px;display:block}
+.row{display:flex;gap:8px}.row>*{flex:1}.field{width:100%;border:1px solid #cbdbe5;border-radius:13px;padding:12px;margin:5px 0;background:#fbfdff}
+.profilebar{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.profileBtn{white-space:nowrap;border:0;border-radius:15px;padding:9px 12px;background:#e6f2fa;font-weight:800}.profileBtn.active{background:#168fe5;color:#fff}
+.nav{position:fixed;bottom:max(10px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(650px,calc(100% - 20px));display:grid;grid-template-columns:repeat(5,1fr);gap:3px;background:#fffffff2;backdrop-filter:blur(12px);padding:7px;border-radius:22px;box-shadow:0 5px 25px #1234;z-index:10}.nav button{border:0;background:none;font-size:10px;color:#40566b;padding:5px 2px}.nav span{display:block;font-size:23px}.nav button.active{color:#087bd0;font-weight:900}
+.listItem{display:flex;justify-content:space-between;gap:8px;align-items:center;border-top:1px solid #e8eef2;padding:10px 0}.note{background:#fff8d9;border-radius:14px;padding:11px;font-size:13px}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.1</small></div><div class="sub" id="profileLabel"></div></div>
+    <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
+  </header>
+
+  <section id="home">
+    <div class="map">
+      <div class="continent na">Nordamerika</div><div class="continent sa">Südamerika</div><div class="continent eu">Europa</div>
+      <div class="continent af">Afrika</div><div class="continent as">Asien</div><div class="continent au">Australien</div>
+      <div class="flagpins p1">🇬🇧</div><div class="flagpins p2">🇩🇪</div><div class="flagpins p3">🇫🇷</div>
+    </div>
+    <div class="card hero"><h2>Englisch trainieren</h2><p>5 Schulvokabeln pro Runde. Richtige Antworten bringen Sterne.</p><button class="btn secondary wide" onclick="startRound()">Runde starten</button></div>
+    <div class="card">
+      <div class="sectionTitle"><h2>🌍 Länder entdeckt</h2><b><span id="countryCount">0</span> / 195</b></div>
+      <div class="progress" style="margin:12px 0"><i id="countryProgress"></i></div>
+      <div class="small" id="nextCountry"></div>
+    </div>
+  </section>
+
+  <section id="learn" class="hidden">
+    <div class="card">
+      <div class="sectionTitle"><b>Vokabelrunde</b><span id="roundLabel">1 / 5</span></div>
+      <div class="progress" style="margin-top:10px"><i id="roundProgress"></i></div>
+      <div class="small" style="text-align:center;margin-top:18px">Wähle die richtige Übersetzung.</div>
+      <div class="question" id="question"></div>
+      <div class="answers" id="answers"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+    <button class="btn wide" onclick="show('home')">Runde verlassen</button>
+  </section>
+
+  <section id="countries" class="hidden">
+    <div class="card"><div class="sectionTitle"><h2>🏳️ Meine Länder</h2><b id="countryCount2"></b></div><p class="small">Neue Länder werden automatisch durch Lernfortschritt freigeschaltet.</p><div class="countryGrid" id="countryGrid"></div></div>
+  </section>
+
+  <section id="badges" class="hidden">
+    <div class="card"><h2>🏆 Abzeichen</h2><div class="badges" id="badgeGrid"></div></div>
+    <div class="card"><h2>🎁 Belohnungen</h2><div id="rewardList"></div><p class="small">Zum Einlösen ist die Eltern-PIN erforderlich.</p></div>
+  </section>
+
+  <section id="parents" class="hidden">
+    <div id="pinbox" class="card">
+      <h2>🔒 Elternbereich</h2><input class="field" id="pin" type="password" inputmode="numeric" placeholder="PIN – Testversion: 1234">
+      <button class="btn primary wide" onclick="unlock()">Öffnen</button>
+    </div>
+    <div id="parentbox" class="hidden">
+      <div class="card">
+        <h2>👨‍👩‍👦 Profile</h2>
+        <p class="small">Für die Testversion liegen die Profile auf diesem Gerät getrennt. Cloud-Synchronisierung wird beim Online-Schalten aktiviert.</p>
+        <div class="profilebar" id="profilebar"></div>
+        <div class="row" style="margin-top:10px"><input class="field" id="newProfile" placeholder="Neues Profil"><button class="btn" onclick="addProfile()">+ Profil</button></div>
+      </div>
+      <div class="card">
+        <h2>📚 Vokabeln für <span id="editProfile"></span></h2>
+        <div class="row"><input class="field" id="en" placeholder="Englisch"><input class="field" id="de" placeholder="Deutsch"></div>
+        <button class="btn wide" onclick="addWord()">+ Vokabel hinzufügen</button>
+        <div id="wordList"></div>
+      </div>
+      <div class="card"><h2>⚙️ Testwerkzeuge</h2><button class="btn" onclick="addTestStars()">+ 20 Teststerne</button> <button class="btn" onclick="resetProfile()">Profil zurücksetzen</button></div>
+    </div>
+  </section>
+
+  <nav class="nav">
+    <button id="nav-home" onclick="show('home')"><span>🌍</span>Weltkarte</button>
+    <button id="nav-learn" onclick="startRound()"><span>📖</span>Lernen</button>
+    <button id="nav-countries" onclick="show('countries')"><span>🏳️</span>Länder</button>
+    <button id="nav-badges" onclick="show('badges')"><span>🏆</span>Abzeichen</button>
+    <button id="nav-parents" onclick="show('parents')"><span>🔒</span>Eltern</button>
+  </nav>
+</main>
+<script>
+const defaultWords=[['dog','Hund'],['cat','Katze'],['school','Schule'],['friend','Freund'],['book','Buch'],['window','Fenster'],['teacher','Lehrer / Lehrerin'],['breakfast','Frühstück'],['garden','Garten'],['family','Familie'],['Monday','Montag'],['yellow','gelb']];
+const countries=[
+['Deutschland','Germany','🇩🇪'],['Vereinigtes Königreich','United Kingdom','🇬🇧'],['Frankreich','France','🇫🇷'],['Dänemark','Denmark','🇩🇰'],['Spanien','Spain','🇪🇸'],['Italien','Italy','🇮🇹'],['Niederlande','Netherlands','🇳🇱'],['Schweden','Sweden','🇸🇪'],['Polen','Poland','🇵🇱'],['Österreich','Austria','🇦🇹'],['Japan','Japan','🇯🇵'],['Australien','Australia','🇦🇺'],['Kanada','Canada','🇨🇦'],['Brasilien','Brazil','🇧🇷'],['Ägypten','Egypt','🇪🇬'],['Südafrika','South Africa','🇿🇦'],['Indien','India','🇮🇳'],['Mexiko','Mexico','🇲🇽'],['Norwegen','Norway','🇳🇴'],['Griechenland','Greece','🇬🇷']
+];
+const unlockAt=[20,50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950];
+const rewards=[['📺 30 Min. Fernsehen',40],['🎮 30 Min. Spielen',60],['🍿 Film aussuchen',100]];
+let db=JSON.parse(localStorage.getItem('english-world-v01')||'null')||{active:'Sohn',profiles:{}};
+function blank(){return {stars:0,totalStars:0,correct:0,streak:0,bestStreak:0,words:JSON.parse(JSON.stringify(defaultWords)),unlocked:[],redeemed:[]}}
+if(!db.profiles.Sohn)db.profiles.Sohn=blank(); if(!db.profiles.Test)db.profiles.Test=blank();
+let round=0,current=null,roundWords=[];
+const $=id=>document.getElementById(id), p=()=>db.profiles[db.active];
+function save(){localStorage.setItem('english-world-v01',JSON.stringify(db));render()}
+function show(id){['home','learn','countries','badges','parents'].forEach(x=>$(x).classList.toggle('hidden',x!==id));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));let n=$('nav-'+id);if(n)n.classList.add('active');render()}
+function render(){
+ $('stars').textContent=p().stars;$('streak').textContent=p().streak;$('profileLabel').textContent='Profil: '+db.active;
+ $('countryCount').textContent=p().unlocked.length;$('countryCount2').textContent=p().unlocked.length+' / 195';
+ $('countryProgress').style.width=Math.min(100,p().unlocked.length/195*100)+'%';
+ let next=unlockAt[p().unlocked.length];$('nextCountry').textContent=next?`Nächstes Land bei ${next} insgesamt verdienten Sternen · noch ${Math.max(0,next-p().totalStars)} ⭐`:'Weitere Länder folgen.';
+ $('countryGrid').innerHTML=countries.map((c,i)=>`<div class="country ${p().unlocked.includes(i)?'':'locked'}"><div class="flag">${c[2]}</div><b>${c[0]}</b><small>${c[1]}</small></div>`).join('');
+ let badges=[
+  ['⭐','Erste Schritte',p().correct>=10,'10 richtige Antworten'],
+  ['🔥','Drangeblieben',p().bestStreak>=10,'10 richtige in Folge'],
+  ['🌍','Entdecker',p().unlocked.length>=3,'3 Länder entdeckt'],
+  ['🏳️','Flaggensammler',p().unlocked.length>=10,'10 Länder entdeckt'],
+  ['📚','Wortprofi',p().correct>=100,'100 richtige Antworten'],
+  ['🏆','English Star',p().correct>=250,'250 richtige Antworten']
+ ];
+ $('badgeGrid').innerHTML=badges.map(b=>`<div class="medal ${b[2]?'':'locked'}"><span>${b[0]}</span><b>${b[1]}</b><br><small>${b[3]}</small></div>`).join('');
+ $('rewardList').innerHTML=rewards.map((r,i)=>`<div class="listItem"><div><b>${r[0]}</b><div class="small">${r[1]} ⭐</div></div><button class="btn" onclick="redeem(${i})" ${p().stars<r[1]?'disabled':''}>Einlösen</button></div>`).join('');
+ $('profilebar').innerHTML=Object.keys(db.profiles).map(n=>`<button class="profileBtn ${n===db.active?'active':''}" onclick="switchProfile('${n.replaceAll("'","\\'")}')">${n}</button>`).join('');
+ $('editProfile').textContent=db.active;
+ $('wordList').innerHTML=p().words.map((w,i)=>`<div class="listItem"><span><b>${w[0]}</b> – ${w[1]}</span><button class="btn" onclick="deleteWord(${i})">×</button></div>`).join('');
+}
+function startRound(){round=0;roundWords=[...p().words].sort(()=>Math.random()-.5).slice(0,5);show('learn');nextWord()}
+function nextWord(){if(round>=roundWords.length){$('question').textContent='Runde geschafft!';$('answers').innerHTML=`<button class="btn primary wide" onclick="show('home')">Zur Weltkarte</button>`;$('toast').textContent='🎉 Stark gemacht.';return}
+ current=roundWords[round];$('roundLabel').textContent=(round+1)+' / '+roundWords.length;$('roundProgress').style.width=(round/roundWords.length*100)+'%';$('question').textContent=current[0];$('toast').textContent='';
+ let opts=[current[1]];while(opts.length<4&&opts.length<p().words.length){let x=p().words[Math.floor(Math.random()*p().words.length)][1];if(!opts.includes(x))opts.push(x)}opts.sort(()=>Math.random()-.5);
+ $('answers').innerHTML=opts.map(x=>`<button class="btn" onclick="answer('${x.replaceAll("'","\\'")}')">${x}</button>`).join('');
+}
+function answer(x){let right=x===current[1];if(right){p().stars+=2;p().totalStars+=2;p().correct++;p().streak++;p().bestStreak=Math.max(p().bestStreak,p().streak);$('toast').textContent='✓ Richtig · +2 ⭐'}else{p().streak=0;$('toast').textContent='Richtig ist: '+current[1]}round++;checkUnlocks();save();setTimeout(nextWord,650)}
+function checkUnlocks(){while(p().unlocked.length<countries.length && p().totalStars >= unlockAt[p().unlocked.length]){let idx=p().unlocked.length;p().unlocked.push(idx);setTimeout(()=>alert('🌍 Neues Land freigeschaltet!\\n\\n'+countries[idx][2]+' '+countries[idx][0]+' · '+countries[idx][1]),100)}}
+function unlock(){if($('pin').value==='1234'){$('pinbox').classList.add('hidden');$('parentbox').classList.remove('hidden');render()}else alert('PIN stimmt nicht.')}
+function switchProfile(n){db.active=n;save()}
+function addProfile(){let n=$('newProfile').value.trim();if(!n||db.profiles[n])return;db.profiles[n]=blank();db.active=n;$('newProfile').value='';save()}
+function addWord(){let a=$('en').value.trim(),b=$('de').value.trim();if(!a||!b)return;p().words.push([a,b]);$('en').value=$('de').value='';save()}
+function deleteWord(i){if(p().words.length<=4)return alert('Mindestens 4 Vokabeln müssen bleiben.');p().words.splice(i,1);save()}
+function redeem(i){let r=rewards[i];let code=prompt('Eltern-PIN eingeben, um „'+r[0]+'“ einzulösen:');if(code!=='1234')return alert('Nicht bestätigt.');if(p().stars<r[1])return;p().stars-=r[1];p().redeemed.push({name:r[0],date:new Date().toISOString()});save();alert('🎁 Belohnung bestätigt.')}
+function addTestStars(){p().stars+=20;p().totalStars+=20;checkUnlocks();save()}
+function resetProfile(){if(confirm('Nur das Profil „'+db.active+'“ zurücksetzen?')){db.profiles[db.active]=blank();save()}}
+render();show('home');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body></html>
