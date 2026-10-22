@@ -13,13 +13,13 @@
 <body>
 <main class="app">
   <header class="top">
-    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.3.2</small></div><div class="sub" id="profileLabel"></div></div>
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.3.3</small></div><div class="sub" id="profileLabel"></div></div>
     <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
   </header>
 
   <section id="home">
     <div class="map" id="worldMap"><svg id="worldSvg" viewBox="0 0 800 400" aria-label="Entdeckte Länder auf der Weltkarte"></svg><div class="mapnote" id="mapNote">Entdeckte Länder erscheinen hier 🌍</div></div>
-    <div class="card hero"><h2>Englisch trainieren</h2><p>10 Schulvokabeln: 5 auswählen, 2 schreiben, 3 Lückensätze. Richtige Antworten bringen Sterne.</p><button class="btn secondary wide" onclick="startRound()">Runde starten</button></div>
+    <div class="card hero"><h2>Englisch trainieren</h2><p>10 Schulvokabeln: 5 auswählen, 2 schreiben, 3 Lückensätze. Richtige Antworten bringen Sterne.</p><button class="btn secondary wide" onclick="startRound()">Runde starten</button><button class="btn wide hidden" id="testCountryBtn" style="margin-top:9px;background:#fff4c7" onclick="testUnlockNow()">🌍 Testland freischalten</button></div>
     <div class="card">
       <div class="sectionTitle"><h2>🌍 Länder entdeckt</h2><b><span id="countryCount">0</span> / 20</b></div>
       <div class="progress" style="margin:12px 0"><i id="countryProgress"></i></div>
@@ -119,7 +119,7 @@ const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>'
 function save(){localStorage.setItem('english-world-v01',JSON.stringify(db));render()}
 function show(id){['home','learn','countries','badges','parents'].forEach(x=>$(x).classList.toggle('hidden',x!==id));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));let n=$('nav-'+id);if(n)n.classList.add('active');render()}
 function render(){
-$('stars').textContent=p().stars;$('streak').textContent=p().streak;$('profileLabel').textContent='Profil: '+db.active;
+$('testCountryBtn').classList.toggle('hidden',db.active!=='Test');$('stars').textContent=p().stars;$('streak').textContent=p().streak;$('profileLabel').textContent='Profil: '+db.active;
 $('countryCount').textContent=p().unlocked.length;$('countryCount2').textContent=p().unlocked.length+' / '+countries.length;
 $('countryProgress').style.width=(p().unlocked.length/countries.length*100)+'%';
 let next=threshold(p().unlocked.length),left=Math.max(0,next-p().totalStars);
@@ -152,14 +152,15 @@ $('answers').innerHTML=opts.map((x,i)=>'<button class="btn" onclick="submitChoic
 }else{
 let target=reverse?current[0]:current[1],promptWord=reverse?current[1]:current[0];window.expected=target;
 $('taskInstruction').textContent='Schreibe die Übersetzung.';$('question').textContent=promptWord;
-$('answers').innerHTML='<form onsubmit="event.preventDefault();submitText()"><input class="field questionInput" id="typedAnswer" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Antwort schreiben" aria-label="Antwort"><button class="btn primary wide" type="submit">Prüfen</button></form>';
+$('answers').innerHTML='<form onsubmit="event.preventDefault();submitText()"><input class="field questionInput" id="typedAnswer" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Antwort schreiben" aria-label="Antwort"><button class="btn primary wide" type="submit">Prüfen</button></form>';
 }}
-function gapSentence(word,german){return 'Englisch für „'+german+'“: ____';}
+function gapSentence(word,german){let sentences={dog:'I walk my _____.',cat:'My _____ says meow.',school:'Every morning I go to _____.',friend:'My best _____ is kind.',book:'I read a _____.',window:'I look out of the _____.',teacher:'Our _____ helps us learn.',breakfast:'I eat _____ in the morning.',garden:'Flowers grow in the _____.',family:'I love my _____.',Monday:'The first school day is _____.',yellow:'The banana is _____.',apple:'I eat an _____.',house:'We live in a _____.',water:'I drink _____.',chair:'I sit on a _____.',table:'My plate is on the _____.',sister:'My _____ is my parents’ daughter.',brother:'My _____ is my parents’ son.',morning:'Good _____!'};return (sentences[word.toLowerCase()]||'I am learning the word _____.')+' ('+german+')';}
 
 function normalize(s){return String(s).toLocaleLowerCase('de').trim().replace(/[.!?]/g,'').replace(/\s+/g,' ')}
 function submitChoice(i){if(waiting)return;finish(window.choices[i]===(task==='gap'?current[0]:current[1]),task==='gap'?current[0]:current[1])}
 function submitText(){if(waiting)return;let v=$('typedAnswer').value.trim();if(!v)return;let accepted=window.expected.split('/').map(normalize);finish(accepted.includes(normalize(v)),window.expected)}
-function finish(right,expected){waiting=true;let idx=p().words.findIndex(w=>w[0]===current[0]&&w[1]===current[1]);if(right){p().stars+=2;p().totalStars+=2;p().correct++;p().streak++;p().bestStreak=Math.max(p().bestStreak,p().streak);p().missed=p().missed.filter(i=>i!==idx);$('toast').textContent='✓ Richtig · +2 ⭐'}else{p().streak=0;if(idx>=0&&!p().missed.includes(idx))p().missed.push(idx);$('toast').textContent='Richtig ist: '+expected}round++;checkUnlocks();save();$('answers').querySelectorAll('button,input').forEach(b=>b.disabled=true);setTimeout(nextWord,1100)}
+function finish(right,expected){waiting=true;let idx=p().words.findIndex(w=>w[0]===current[0]&&w[1]===current[1]);if(right){p().stars+=2;p().totalStars+=2;p().correct++;p().streak++;p().bestStreak=Math.max(p().bestStreak,p().streak);p().missed=p().missed.filter(i=>i!==idx);$('toast').textContent='✓ Richtig · +2 ⭐'}else{p().streak=0;if(idx>=0&&!p().missed.includes(idx))p().missed.push(idx);$('toast').textContent='✗ Falsch – richtig ist: '+expected}round++;checkUnlocks();save();$('answers').querySelectorAll('button,input').forEach(b=>b.disabled=true);setTimeout(nextWord,1100)}
+function testUnlockNow(){if(db.active!=='Test')return;let before=p().unlocked.length;unlockTestCountry();save();if(p().unlocked.length===before)alert('Alle Testländer sind bereits entdeckt.');else showModalQueue()}
 function unlockTestCountry(){if(p().unlocked.length>=countries.length)return;let before=p().unlocked.slice();let idx=p().unlockOrder.find(i=>!p().unlocked.includes(i));if(idx===undefined)return;p().unlocked.push(idx);queue.push({type:'country',idx});for(let c of new Set(countries.map(x=>x.continent))){let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0);if(ids.every(i=>p().unlocked.includes(i))&&!ids.every(i=>before.includes(i)))queue.push({type:'continent',name:c});}}
 function checkUnlocks(){let before=p().unlocked.slice();while(p().unlocked.length<countries.length&&p().totalStars>=threshold(p().unlocked.length)){let idx=p().unlockOrder.find(i=>!p().unlocked.includes(i));if(idx===undefined)break;p().unlocked.push(idx);queue.push({type:'country',idx});}
 for(let c of new Set(countries.map(x=>x.continent))){let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0);if(ids.every(i=>p().unlocked.includes(i))&&!ids.every(i=>before.includes(i)))queue.push({type:'continent',name:c});}}
