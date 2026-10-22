@@ -13,7 +13,7 @@
 <body>
 <main class="app">
   <header class="top">
-    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.4.2</small></div><div class="sub" id="profileLabel"></div></div>
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.4.3</small></div><div class="sub" id="profileLabel"></div></div>
     <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
   </header>
 
@@ -34,7 +34,7 @@
       <div class="small" style="text-align:center;margin-top:18px"><span id="taskInstruction">Wähle die richtige Übersetzung.</span></div>
       <div class="question" id="question"></div>
       <div class="answers" id="answers"></div>
-      <div class="toast" id="toast"></div>
+      <div class="toast" id="toast"></div><button class="btn wide" id="helpBtn" onclick="useHelp()" style="margin-top:8px">💡 Hilfe (2 ⭐)</button><div class="small" id="helpInfo" style="text-align:center;margin-top:5px"></div>
     </div>
     <button class="btn wide" onclick="show('home')">Runde verlassen</button>
   </section>
@@ -136,8 +136,8 @@ $('wordList').innerHTML=p().words.map((w,i)=>'<div class="listItem"><span><b>'+e
 drawMap();
 }
 function startRound(){round=0;roundRewardGiven=false;waiting=false;let missed=p().missed.map(i=>p().words[i]).filter(Boolean);roundWords=[...missed.slice(0,4),...shuffle(p().words).filter(w=>!missed.includes(w))].slice(0,10);if(roundWords.length<10)roundWords=[...roundWords,...shuffle(p().words).slice(0,10-roundWords.length)];roundWords=shuffle(roundWords);roundTasks=shuffle(['choice','choice','choice','choice','choice','write','write','gap','gap','gap']);show('learn');nextWord()}
-function nextWord(){waiting=false;if(round>=roundWords.length){if(db.active==='Test'&&!roundRewardGiven){roundRewardGiven=true;unlockTestCountry();save()}$('question').textContent='Runde geschafft!';$('answers').innerHTML='<button class="btn primary wide" onclick="show(\'home\')">Zur Weltkarte</button>';$('toast').textContent='🎉 Gut gemacht!';$('roundProgress').style.width='100%';if(queue.length)showModalQueue();return}
-current=roundWords[round];task=roundTasks[round]||'choice';
+function nextWord(){waiting=false;if(round>=roundWords.length){$('helpBtn').classList.add('hidden');$('helpInfo').textContent='';if(db.active==='Test'&&!roundRewardGiven){roundRewardGiven=true;unlockTestCountry();save()}$('question').textContent='Runde geschafft!';$('answers').innerHTML='<button class="btn primary wide" onclick="show(\'home\')">Zur Weltkarte</button>';$('toast').textContent='🎉 Gut gemacht!';$('roundProgress').style.width='100%';if(queue.length)showModalQueue();return}
+current=roundWords[round];task=roundTasks[round]||'choice';$('helpBtn').disabled=p().stars<2;$('helpBtn').classList.remove('hidden');$('helpInfo').textContent='';
 $('roundLabel').textContent=(round+1)+' / '+roundWords.length;$('roundProgress').style.width=(round/roundWords.length*100)+'%';$('toast').textContent='';$('toast').className='toast';
 let reverse=round%2===0;
 if(task==='choice'||task==='gap'){
@@ -157,9 +157,10 @@ $('answers').innerHTML='<form onsubmit="event.preventDefault();submitText()"><in
 function gapSentence(word,german){let sentences={dog:'I walk my _____.',cat:'My _____ says meow.',school:'Every morning I go to _____.',friend:'My best _____ is kind.',book:'I read a _____.',window:'I look out of the _____.',teacher:'Our _____ helps us learn.',breakfast:'I eat _____ in the morning.',garden:'Flowers grow in the _____.',family:'I love my _____.',Monday:'The first school day is _____.',yellow:'The banana is _____.',apple:'I eat an _____.',house:'We live in a _____.',water:'I drink _____.',chair:'I sit on a _____.',table:'My plate is on the _____.',sister:'My _____ is my parents’ daughter.',brother:'My _____ is my parents’ son.',morning:'Good _____!'};return (sentences[word.toLowerCase()]||'I am learning the word _____.')+' ('+german+')';}
 
 function normalize(s){return String(s).toLocaleLowerCase('de').trim().replace(/[.!?]/g,'').replace(/\s+/g,' ')}
+function useHelp(){if(waiting||p().stars<2||$('helpBtn').disabled)return;p().stars-=2;save();$('stars').textContent=p().stars;$('helpBtn').disabled=true;let msg='';if(task==='write'){let answer=window.expected||'';msg='Erster Buchstabe: '+answer.charAt(0).toUpperCase();}else{let correct=task==='gap'?current[0]:current[1];let buttons=[...$('answers').querySelectorAll('button')];let wrong=buttons.filter(b=>b.textContent!==correct);shuffle(wrong).slice(0,2).forEach(b=>{b.disabled=true;b.style.opacity='.28'});msg='Zwei falsche Antworten entfernt.';}$('helpInfo').textContent='💡 '+msg}
 function submitChoice(i){if(waiting)return;finish(window.choices[i]===(task==='gap'?current[0]:current[1]),task==='gap'?current[0]:current[1])}
 function submitText(){if(waiting)return;let v=$('typedAnswer').value.trim();if(!v)return;let accepted=window.expected.split('/').map(normalize);finish(accepted.includes(normalize(v)),window.expected)}
-function finish(right,expected){waiting=true;let idx=p().words.findIndex(w=>w[0]===current[0]&&w[1]===current[1]);if(right){p().stars+=2;p().totalStars+=2;p().correct++;p().streak++;p().bestStreak=Math.max(p().bestStreak,p().streak);p().missed=p().missed.filter(i=>i!==idx);$('toast').className='toast correct';$('toast').textContent='✔ Richtig · +2 ⭐'}else{p().streak=0;if(idx>=0&&!p().missed.includes(idx))p().missed.push(idx);$('toast').className='toast wrong';$('toast').innerHTML='❌ Falsch<span class="answer">Richtig: '+escapeHtml(expected)+'</span>'}round++;checkUnlocks();save();$('answers').querySelectorAll('button,input').forEach(b=>b.disabled=true);setTimeout(nextWord,right?1500:3200)}
+function finish(right,expected){waiting=true;$('helpBtn').disabled=true;let idx=p().words.findIndex(w=>w[0]===current[0]&&w[1]===current[1]);if(right){p().stars+=2;p().totalStars+=2;p().correct++;p().streak++;p().bestStreak=Math.max(p().bestStreak,p().streak);p().missed=p().missed.filter(i=>i!==idx);$('toast').className='toast correct';$('toast').textContent='✔ Richtig · +2 ⭐'}else{p().streak=0;if(idx>=0&&!p().missed.includes(idx))p().missed.push(idx);$('toast').className='toast wrong';$('toast').innerHTML='❌ Falsch<span class="answer">Richtig: '+escapeHtml(expected)+'</span>'}round++;checkUnlocks();save();$('answers').querySelectorAll('button,input').forEach(b=>b.disabled=true);setTimeout(nextWord,right?1500:3200)}
 function testUnlockNow(){if(db.active!=='Test')return;let before=p().unlocked.length;unlockTestCountry();save();if(p().unlocked.length===before)alert('Alle Testländer sind bereits entdeckt.');else showModalQueue()}
 function unlockTestCountry(){if(p().unlocked.length>=countries.length)return;let before=p().unlocked.slice();let idx=p().unlockOrder.find(i=>!p().unlocked.includes(i));if(idx===undefined)return;p().unlocked.push(idx);queue.push({type:'country',idx});for(let c of new Set(countries.map(x=>x.continent))){let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0);if(ids.every(i=>p().unlocked.includes(i))&&!ids.every(i=>before.includes(i)))queue.push({type:'continent',name:c});}}
 function checkUnlocks(){let before=p().unlocked.slice();while(p().unlocked.length<countries.length&&p().totalStars>=threshold(p().unlocked.length)){let idx=p().unlockOrder.find(i=>!p().unlocked.includes(i));if(idx===undefined)break;p().unlocked.push(idx);queue.push({type:'country',idx});}
