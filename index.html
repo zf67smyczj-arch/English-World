@@ -13,7 +13,7 @@
 <body>
 <main class="app">
   <header class="top">
-    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.3.1</small></div><div class="sub" id="profileLabel"></div></div>
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.3.2</small></div><div class="sub" id="profileLabel"></div></div>
     <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
   </header>
 
@@ -113,7 +113,7 @@ function blank(){return {stars:0,totalStars:0,correct:0,streak:0,bestStreak:0,wo
 if(!db.profiles.Sohn)db.profiles.Sohn=blank();if(!db.profiles.Test)db.profiles.Test=blank();
 function migrate(q){q.unlocked=q.unlocked||[];q.words=q.words||JSON.parse(JSON.stringify(defaultWords));q.redeemed=q.redeemed||[];q.missed=q.missed||[];if(!q.unlockOrder){q.unlockOrder=[...q.unlocked,...shuffle(countries.map((_,i)=>i).filter(i=>!q.unlocked.includes(i)))];}q.unlockOrder=[...new Set([...q.unlocked,...q.unlockOrder,...countries.map((_,i)=>i)])];}
 Object.values(db.profiles).forEach(migrate);
-let round=0,current=null,roundWords=[],task='',waiting=false,queue=[],mapFeatures=null;
+let round=0,current=null,roundWords=[],task='',waiting=false,queue=[],mapFeatures=null,roundRewardGiven=false;
 const p=()=>db.profiles[db.active];
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function save(){localStorage.setItem('english-world-v01',JSON.stringify(db));render()}
@@ -135,8 +135,8 @@ $('editProfile').textContent=db.active;
 $('wordList').innerHTML=p().words.map((w,i)=>'<div class="listItem"><span><b>'+escapeHtml(w[0])+'</b> – '+escapeHtml(w[1])+'</span><button class="btn" onclick="deleteWord('+i+')">×</button></div>').join('');
 drawMap();
 }
-function startRound(){round=0;waiting=false;let missed=p().missed.map(i=>p().words[i]).filter(Boolean);roundWords=[...missed.slice(0,4),...shuffle(p().words).filter(w=>!missed.includes(w))].slice(0,10);if(roundWords.length<10)roundWords=[...roundWords,...shuffle(p().words).slice(0,10-roundWords.length)];roundWords=shuffle(roundWords);show('learn');nextWord()}
-function nextWord(){waiting=false;if(round>=roundWords.length){$('question').textContent='Runde geschafft!';$('answers').innerHTML='<button class="btn primary wide" onclick="show(\'home\')">Zur Weltkarte</button>';$('toast').textContent='🎉 Gut gemacht!';$('roundProgress').style.width='100%';if(queue.length)showModalQueue();return}
+function startRound(){round=0;roundRewardGiven=false;waiting=false;let missed=p().missed.map(i=>p().words[i]).filter(Boolean);roundWords=[...missed.slice(0,4),...shuffle(p().words).filter(w=>!missed.includes(w))].slice(0,10);if(roundWords.length<10)roundWords=[...roundWords,...shuffle(p().words).slice(0,10-roundWords.length)];roundWords=shuffle(roundWords);show('learn');nextWord()}
+function nextWord(){waiting=false;if(round>=roundWords.length){if(db.active==='Test'&&!roundRewardGiven){roundRewardGiven=true;unlockTestCountry();save()}$('question').textContent='Runde geschafft!';$('answers').innerHTML='<button class="btn primary wide" onclick="show(\'home\')">Zur Weltkarte</button>';$('toast').textContent='🎉 Gut gemacht!';$('roundProgress').style.width='100%';if(queue.length)showModalQueue();return}
 current=roundWords[round];task=round<5?'choice':round<7?'write':'gap';
 $('roundLabel').textContent=(round+1)+' / '+roundWords.length;$('roundProgress').style.width=(round/roundWords.length*100)+'%';$('toast').textContent='';
 let reverse=round%2===0;
@@ -160,6 +160,7 @@ function normalize(s){return String(s).toLocaleLowerCase('de').trim().replace(/[
 function submitChoice(i){if(waiting)return;finish(window.choices[i]===(task==='gap'?current[0]:current[1]),task==='gap'?current[0]:current[1])}
 function submitText(){if(waiting)return;let v=$('typedAnswer').value.trim();if(!v)return;let accepted=window.expected.split('/').map(normalize);finish(accepted.includes(normalize(v)),window.expected)}
 function finish(right,expected){waiting=true;let idx=p().words.findIndex(w=>w[0]===current[0]&&w[1]===current[1]);if(right){p().stars+=2;p().totalStars+=2;p().correct++;p().streak++;p().bestStreak=Math.max(p().bestStreak,p().streak);p().missed=p().missed.filter(i=>i!==idx);$('toast').textContent='✓ Richtig · +2 ⭐'}else{p().streak=0;if(idx>=0&&!p().missed.includes(idx))p().missed.push(idx);$('toast').textContent='Richtig ist: '+expected}round++;checkUnlocks();save();$('answers').querySelectorAll('button,input').forEach(b=>b.disabled=true);setTimeout(nextWord,1100)}
+function unlockTestCountry(){if(p().unlocked.length>=countries.length)return;let before=p().unlocked.slice();let idx=p().unlockOrder.find(i=>!p().unlocked.includes(i));if(idx===undefined)return;p().unlocked.push(idx);queue.push({type:'country',idx});for(let c of new Set(countries.map(x=>x.continent))){let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0);if(ids.every(i=>p().unlocked.includes(i))&&!ids.every(i=>before.includes(i)))queue.push({type:'continent',name:c});}}
 function checkUnlocks(){let before=p().unlocked.slice();while(p().unlocked.length<countries.length&&p().totalStars>=threshold(p().unlocked.length)){let idx=p().unlockOrder.find(i=>!p().unlocked.includes(i));if(idx===undefined)break;p().unlocked.push(idx);queue.push({type:'country',idx});}
 for(let c of new Set(countries.map(x=>x.continent))){let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0);if(ids.every(i=>p().unlocked.includes(i))&&!ids.every(i=>before.includes(i)))queue.push({type:'continent',name:c});}}
 function showModalQueue(){if(!queue.length)return;let e=queue.shift();if(e.type==='country'){let c=countries[e.idx];openModal('<div class="confetti">🎊 ✨ 🎉</div><div class="big">'+c.flag+'</div><h2>Neues Land entdeckt!</h2><h3>'+c.name+'</h3><p>Jetzt leuchtet es auf deiner Weltkarte!</p><button class="btn primary wide" onclick="closeModal()">Weiter</button>')}else openModal('<div class="confetti">🎊 ✨ 🎉</div><div class="big">🏆</div><h2>'+e.name+'-Meister!</h2><p>Du hast alle Länder dieses Kontinents entdeckt!</p><button class="btn primary wide" onclick="closeModal()">Weiter</button>')}
