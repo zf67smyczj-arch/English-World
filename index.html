@@ -13,7 +13,7 @@
 <body>
 <main class="app">
   <header class="top">
-    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.4.8</small></div><div class="sub" id="profileLabel"></div></div>
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.4.9</small></div><div class="sub" id="profileLabel"></div></div>
     <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
   </header>
 
@@ -103,7 +103,37 @@ const countries=[
 {name:'Indien',en:'India',flag:'🇮🇳',iso:'356',capital:'Neu-Delhi',continent:'Asien',fact:'In Indien steht das berühmte Taj Mahal.'},
 {name:'Mexiko',en:'Mexico',flag:'🇲🇽',iso:'484',capital:'Mexiko-Stadt',continent:'Nordamerika',fact:'In Mexiko stehen beeindruckende Pyramiden der Maya.'},
 {name:'Norwegen',en:'Norway',flag:'🇳🇴',iso:'578',capital:'Oslo',continent:'Europa',fact:'Norwegen ist berühmt für seine tiefen Fjorde.'},
-{name:'Griechenland',en:'Greece',flag:'🇬🇷',iso:'300',capital:'Athen',continent:'Europa',fact:'Die ersten antiken Olympischen Spiele fanden in Griechenland statt.'}
+{name:'Griechenland',en:'Greece',flag:'🇬🇷',iso:'300',capital:'Athen',continent:'Europa',fact:'Die ersten antiken Olympischen Spiele fanden in Griechenland statt.'},
+{name:'USA',en:'United States',flag:'🇺🇸',iso:'840',capital:'Washington, D.C.',continent:'Nordamerika',fact:'In den USA liegt der Grand Canyon.'},
+{name:'China',en:'China',flag:'🇨🇳',iso:'156',capital:'Peking',continent:'Asien',fact:'Die Chinesische Mauer ist Tausende Kilometer lang.'},
+{name:'Schweiz',en:'Switzerland',flag:'🇨🇭',iso:'756',capital:'Bern',continent:'Europa',fact:'In der Schweiz gibt es vier Landessprachen.'},
+{name:'Belgien',en:'Belgium',flag:'🇧🇪',iso:'056',capital:'Brüssel',continent:'Europa',fact:'Belgien ist für seine Waffeln bekannt.'},
+{name:'Portugal',en:'Portugal',flag:'🇵🇹',iso:'620',capital:'Lissabon',continent:'Europa',fact:'Portugal liegt am Atlantischen Ozean.'},
+{name:'Irland',en:'Ireland',flag:'🇮🇪',iso:'372',capital:'Dublin',continent:'Europa',fact:'Irland wird wegen seiner grünen Landschaft die grüne Insel genannt.'},
+{name:'Finnland',en:'Finland',flag:'🇫🇮',iso:'246',capital:'Helsinki',continent:'Europa',fact:'In Finnland gibt es besonders viele Seen.'},
+{name:'Island',en:'Iceland',flag:'🇮🇸',iso:'352',capital:'Reykjavík',continent:'Europa',fact:'In Island gibt es Geysire und Vulkane.'},
+{name:'Tschechien',en:'Czechia',flag:'🇨🇿',iso:'203',capital:'Prag',continent:'Europa',fact:'In Prag steht eine berühmte astronomische Uhr.'},
+{name:'Ungarn',en:'Hungary',flag:'🇭🇺',iso:'348',capital:'Budapest',continent:'Europa',fact:'Durch Budapest fließt die Donau.'},
+{name:'Kroatien',en:'Croatia',flag:'🇭🇷',iso:'191',capital:'Zagreb',continent:'Europa',fact:'Kroatien hat viele Inseln in der Adria.'},
+{name:'Türkei',en:'Türkiye',flag:'🇹🇷',iso:'792',capital:'Ankara',continent:'Asien',fact:'Istanbul liegt auf zwei Kontinenten.'},
+{name:'Ukraine',en:'Ukraine',flag:'🇺🇦',iso:'804',capital:'Kyjiw',continent:'Europa',fact:'Die Ukraine ist eines der größten Länder Europas.'},
+{name:'Rumänien',en:'Romania',flag:'🇷🇴',iso:'642',capital:'Bukarest',continent:'Europa',fact:'In Rumänien liegen die Karpaten.'},
+{name:'Bulgarien',en:'Bulgaria',flag:'🇧🇬',iso:'100',capital:'Sofia',continent:'Europa',fact:'In Bulgarien wird das kyrillische Alphabet verwendet.'},
+{name:'Südkorea',en:'South Korea',flag:'🇰🇷',iso:'410',capital:'Seoul',continent:'Asien',fact:'In Südkorea ist Taekwondo sehr beliebt.'},
+{name:'Thailand',en:'Thailand',flag:'🇹🇭',iso:'764',capital:'Bangkok',continent:'Asien',fact:'In Thailand leben wilde Elefanten.'},
+{name:'Vietnam',en:'Vietnam',flag:'🇻🇳',iso:'704',capital:'Hanoi',continent:'Asien',fact:'In Vietnam gibt es viele Reisfelder.'},
+{name:'Indonesien',en:'Indonesia',flag:'🇮🇩',iso:'360',capital:'Jakarta',continent:'Asien',fact:'Indonesien besteht aus Tausenden Inseln.'},
+{name:'Neuseeland',en:'New Zealand',flag:'🇳🇿',iso:'554',capital:'Wellington',continent:'Ozeanien',fact:'In Neuseeland lebt der flugunfähige Kiwi-Vogel.'},
+{name:'Argentinien',en:'Argentina',flag:'🇦🇷',iso:'032',capital:'Buenos Aires',continent:'Südamerika',fact:'In Argentinien wird viel Tango getanzt.'},
+{name:'Chile',en:'Chile',flag:'🇨🇱',iso:'152',capital:'Santiago de Chile',continent:'Südamerika',fact:'Chile ist ein besonders langes und schmales Land.'},
+{name:'Peru',en:'Peru',flag:'🇵🇪',iso:'604',capital:'Lima',continent:'Südamerika',fact:'In Peru liegt die alte Inkastadt Machu Picchu.'},
+{name:'Kolumbien',en:'Colombia',flag:'🇨🇴',iso:'170',capital:'Bogotá',continent:'Südamerika',fact:'In Kolumbien leben besonders viele Vogelarten.'},
+{name:'Kenia',en:'Kenya',flag:'🇰🇪',iso:'404',capital:'Nairobi',continent:'Afrika',fact:'In Kenia kann man Löwen und Giraffen in der Savanne sehen.'},
+{name:'Marokko',en:'Morocco',flag:'🇲🇦',iso:'504',capital:'Rabat',continent:'Afrika',fact:'In Marokko gibt es Berge und Wüsten.'},
+{name:'Nigeria',en:'Nigeria',flag:'🇳🇬',iso:'566',capital:'Abuja',continent:'Afrika',fact:'Nigeria ist das bevölkerungsreichste Land Afrikas.'},
+{name:'Tansania',en:'Tanzania',flag:'🇹🇿',iso:'834',capital:'Dodoma',continent:'Afrika',fact:'In Tansania liegt der Kilimandscharo.'},
+{name:'Saudi-Arabien',en:'Saudi Arabia',flag:'🇸🇦',iso:'682',capital:'Riad',continent:'Asien',fact:'Ein großer Teil Saudi-Arabiens besteht aus Wüste.'},
+{name:'Vereinigte Arabische Emirate',en:'United Arab Emirates',flag:'🇦🇪',iso:'784',capital:'Abu Dhabi',continent:'Asien',fact:'In Dubai steht eines der höchsten Gebäude der Welt.'}
 ];
 
 const $=id=>document.getElementById(id);
