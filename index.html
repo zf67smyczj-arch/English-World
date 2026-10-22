@@ -196,7 +196,6 @@ function switchProfileByIndex(i){db.active=Object.keys(db.profiles)[i];save()}
 function addProfile(){let n=$('newProfile').value.trim();if(!n||db.profiles[n])return;db.profiles[n]=blank();db.active=n;$('newProfile').value='';save()}
 function addWord(){let a=$('en').value.trim(),b=$('de').value.trim();if(!a||!b)return;p().words.push([a,b]);$('en').value=$('de').value='';save()}
 function deleteWord(i){if(p().words.length<=4)return alert('Mindestens 4 Vokabeln müssen bleiben.');p().words.splice(i,1);p().missed=[];save()}
-function redeem(i){let r=rewards[i],code=prompt('Eltern-PIN eingeben, um „'+r[0]+'“ einzulösen:');if(code!=='1234')return alert('Nicht bestätigt.');if(p().stars<r[1])return;p().stars-=r[1];p().redeemed.push({name:r[0],date:new Date().toISOString()});save();alert('🎁 Belohnung bestätigt.')}
 function addTestStars(){p().stars+=20;p().totalStars+=20;checkUnlocks();save();if(queue.length)showModalQueue()}
 function resetProfile(){if(confirm('Nur das Profil „'+db.active+'“ zurücksetzen?')){db.profiles[db.active]=blank();save()}}
 function point(lon,lat){return [(lon+180)*800/360,(83-lat)*330/145]}
