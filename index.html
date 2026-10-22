@@ -13,7 +13,7 @@
 <body>
 <main class="app">
   <header class="top">
-    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.4.4</small></div><div class="sub" id="profileLabel"></div></div>
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.4.5</small></div><div class="sub" id="profileLabel"></div></div>
     <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
   </header>
 
@@ -82,6 +82,7 @@
 <script>
 
 const defaultWords=[['dog','Hund'],['cat','Katze'],['school','Schule'],['friend','Freund'],['book','Buch'],['window','Fenster'],['teacher','Lehrer / Lehrerin'],['breakfast','Frühstück'],['garden','Garten'],['family','Familie'],['Monday','Montag'],['yellow','gelb'],['apple','Apfel'],['house','Haus'],['water','Wasser'],['chair','Stuhl'],['table','Tisch'],['sister','Schwester'],['brother','Bruder'],['morning','Morgen']];
+const bonusWords=[['beautiful','schön'],['difficult','schwierig'],['important','wichtig'],['different','anders'],['interesting','interessant'],['together','zusammen'],['because','weil'],['sometimes','manchmal'],['yesterday','gestern'],['tomorrow','morgen'],['weather','Wetter'],['holiday','Ferien'],['question','Frage'],['answer','Antwort'],['favorite','Lieblings-']];
 const countries=[
 {name:'Deutschland',en:'Germany',flag:'🇩🇪',iso:'276',capital:'Berlin',continent:'Europa',fact:'In Deutschland gibt es mehr als 20.000 Burgen und Schlösser.'},
 {name:'Vereinigtes Königreich',en:'United Kingdom',flag:'🇬🇧',iso:'826',capital:'London',continent:'Europa',fact:'London besitzt eine der ältesten U-Bahnen der Welt.'},
@@ -113,7 +114,7 @@ function blank(){return {stars:0,totalStars:0,correct:0,streak:0,bestStreak:0,wo
 if(!db.profiles.Sohn)db.profiles.Sohn=blank();if(!db.profiles.Test)db.profiles.Test=blank();
 function migrate(q){q.unlocked=q.unlocked||[];q.words=q.words||JSON.parse(JSON.stringify(defaultWords));q.redeemed=q.redeemed||[];q.missed=q.missed||[];if(!q.unlockOrder){q.unlockOrder=[...q.unlocked,...shuffle(countries.map((_,i)=>i).filter(i=>!q.unlocked.includes(i)))];}q.unlockOrder=[...new Set([...q.unlocked,...q.unlockOrder,...countries.map((_,i)=>i)])];}
 Object.values(db.profiles).forEach(migrate);
-let round=0,current=null,roundWords=[],task='',waiting=false,queue=[],mapFeatures=null,roundRewardGiven=false,roundTasks=[],mapZoom=1.55,mapCenterX=420,mapCenterY=165,mapPointers=new Map(),mapGesture=false,mapStart=null;
+let round=0,current=null,roundWords=[],task='',waiting=false,queue=[],mapFeatures=null,roundRewardGiven=false,roundTasks=[],bonusRound=false,mapZoom=1.55,mapCenterX=420,mapCenterY=165,mapPointers=new Map(),mapGesture=false,mapStart=null;
 const p=()=>db.profiles[db.active];
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function save(){localStorage.setItem('english-world-v01',JSON.stringify(db));render()}
@@ -135,14 +136,14 @@ $('editProfile').textContent=db.active;
 $('wordList').innerHTML=p().words.map((w,i)=>'<div class="listItem"><span><b>'+escapeHtml(w[0])+'</b> – '+escapeHtml(w[1])+'</span><button class="btn" onclick="deleteWord('+i+')">×</button></div>').join('');
 drawMap();
 }
-function startRound(){round=0;roundRewardGiven=false;waiting=false;let missed=p().missed.map(i=>p().words[i]).filter(Boolean);roundWords=[...missed.slice(0,4),...shuffle(p().words).filter(w=>!missed.includes(w))].slice(0,10);if(roundWords.length<10)roundWords=[...roundWords,...shuffle(p().words).slice(0,10-roundWords.length)];roundWords=shuffle(roundWords);roundTasks=shuffle(['choice','choice','choice','choice','choice','write','write','gap','gap','gap']);show('learn');nextWord()}
-function nextWord(){waiting=false;if(round>=roundWords.length){$('helpBtn').classList.add('hidden');$('helpInfo').textContent='';if(db.active==='Test'&&!roundRewardGiven){roundRewardGiven=true;unlockTestCountry();save()}$('question').textContent='Runde geschafft!';$('answers').innerHTML='<button class="btn primary wide" onclick="show(\'home\')">Zur Weltkarte</button>';$('toast').textContent='🎉 Gut gemacht!';$('roundProgress').style.width='100%';if(queue.length)showModalQueue();return}
-current=roundWords[round];task=roundTasks[round]||'choice';$('helpBtn').disabled=p().stars<2;$('helpBtn').classList.remove('hidden');$('helpInfo').textContent='';
-$('roundLabel').textContent=(round+1)+' / '+roundWords.length;$('roundProgress').style.width=(round/roundWords.length*100)+'%';$('toast').textContent='';$('toast').className='toast';
+function startRound(){round=0;roundRewardGiven=false;waiting=false;bonusRound=Math.random()<0.2;if(bonusRound){roundWords=shuffle(bonusWords).slice(0,5);roundTasks=shuffle(['choice','choice','choice','write','write']);show('learn');alert('🌟 Überraschung! Bonusrunde mit 5 etwas schwierigeren Vokabeln. Jede richtige Antwort bringt 5 Sterne!');nextWord();return;}let missed=p().missed.map(i=>p().words[i]).filter(Boolean);roundWords=[...missed.slice(0,4),...shuffle(p().words).filter(w=>!missed.includes(w))].slice(0,10);if(roundWords.length<10)roundWords=[...roundWords,...shuffle(p().words).slice(0,10-roundWords.length)];roundWords=shuffle(roundWords);roundTasks=shuffle(['choice','choice','choice','choice','choice','write','write','gap','gap','gap']);show('learn');nextWord()}
+function nextWord(){waiting=false;if(round>=roundWords.length){$('helpBtn').classList.add('hidden');$('helpInfo').textContent='';if(db.active==='Test'&&!bonusRound&&!roundRewardGiven){roundRewardGiven=true;unlockTestCountry();save()}$('question').textContent=bonusRound?'🎉 Bonusrunde geschafft!':'Runde geschafft!';$('answers').innerHTML='<button class="btn primary wide" onclick="show(\'home\')">Zur Weltkarte</button>';$('toast').textContent='🎉 Gut gemacht!';$('roundProgress').style.width='100%';if(queue.length)showModalQueue();return}
+current=roundWords[round];task=roundTasks[round]||'choice';$('taskInstruction').style.color=bonusRound?'#a56700':'';$('helpBtn').disabled=p().stars<2;$('helpBtn').classList.remove('hidden');$('helpInfo').textContent='';
+$('roundLabel').textContent=(bonusRound?'⭐ Bonus · ':'')+(round+1)+' / '+roundWords.length;$('roundProgress').style.width=(round/roundWords.length*100)+'%';$('toast').textContent='';$('toast').className='toast';
 let reverse=round%2===0;
 if(task==='choice'||task==='gap'){
 reverse=false;let opts=[task==='gap'?current[0]:current[1]];
-for(let w of shuffle(p().words)){let v=task==='gap'?w[0]:w[1];if(opts.length>=4)break;if(!opts.includes(v))opts.push(v)}
+for(let w of shuffle(bonusRound?bonusWords:p().words)){let v=task==='gap'?w[0]:w[1];if(opts.length>=4)break;if(!opts.includes(v))opts.push(v)}
 opts=shuffle(opts);window.choices=opts;
 if(task==='gap'){
 let sentence=gapSentence(current[0],current[1]);$('taskInstruction').textContent='Welches englische Wort fehlt im Satz?';
@@ -160,7 +161,7 @@ function normalize(s){return String(s).toLocaleLowerCase('de').trim().replace(/[
 function useHelp(){if(waiting||p().stars<2||$('helpBtn').disabled)return;if(!confirm('⚠️ Achtung! Diese Hilfe kostet 2 Sterne. Möchtest du die Hilfe wirklich benutzen?'))return;p().stars-=2;save();$('stars').textContent=p().stars;$('helpBtn').disabled=true;let msg='';if(task==='write'){let answer=window.expected||'';msg='Erster Buchstabe: '+answer.charAt(0).toUpperCase();}else{let correct=task==='gap'?current[0]:current[1];let buttons=[...$('answers').querySelectorAll('button')];let wrong=buttons.filter(b=>b.textContent!==correct);shuffle(wrong).slice(0,2).forEach(b=>{b.disabled=true;b.style.opacity='.28'});msg='Zwei falsche Antworten entfernt.';}$('helpInfo').textContent='💡 '+msg}
 function submitChoice(i){if(waiting)return;finish(window.choices[i]===(task==='gap'?current[0]:current[1]),task==='gap'?current[0]:current[1])}
 function submitText(){if(waiting)return;let v=$('typedAnswer').value.trim();if(!v)return;let accepted=window.expected.split('/').map(normalize);finish(accepted.includes(normalize(v)),window.expected)}
-function finish(right,expected){waiting=true;$('helpBtn').disabled=true;let idx=p().words.findIndex(w=>w[0]===current[0]&&w[1]===current[1]);if(right){p().stars+=2;p().totalStars+=2;p().correct++;p().streak++;p().bestStreak=Math.max(p().bestStreak,p().streak);p().missed=p().missed.filter(i=>i!==idx);$('toast').className='toast correct';$('toast').textContent='✔ Richtig · +2 ⭐'}else{p().streak=0;if(idx>=0&&!p().missed.includes(idx))p().missed.push(idx);$('toast').className='toast wrong';$('toast').innerHTML='❌ Falsch<span class="answer">Richtig: '+escapeHtml(expected)+'</span>'}round++;checkUnlocks();save();$('answers').querySelectorAll('button,input').forEach(b=>b.disabled=true);setTimeout(nextWord,right?1500:3200)}
+function finish(right,expected){waiting=true;$('helpBtn').disabled=true;let idx=p().words.findIndex(w=>w[0]===current[0]&&w[1]===current[1]);if(right){let earned=bonusRound?5:2;p().stars+=earned;p().totalStars+=earned;p().correct++;p().streak++;p().bestStreak=Math.max(p().bestStreak,p().streak);p().missed=p().missed.filter(i=>i!==idx);$('toast').className='toast correct';$('toast').textContent='✔ Richtig · +'+earned+' ⭐'}else{p().streak=0;if(idx>=0&&!p().missed.includes(idx))p().missed.push(idx);$('toast').className='toast wrong';$('toast').innerHTML='❌ Falsch<span class="answer">Richtig: '+escapeHtml(expected)+'</span>'}round++;checkUnlocks();save();$('answers').querySelectorAll('button,input').forEach(b=>b.disabled=true);setTimeout(nextWord,right?1500:3200)}
 function testUnlockNow(){if(db.active!=='Test')return;let before=p().unlocked.length;unlockTestCountry();save();if(p().unlocked.length===before)alert('Alle Testländer sind bereits entdeckt.');else showModalQueue()}
 function unlockTestCountry(){if(p().unlocked.length>=countries.length)return;let before=p().unlocked.slice();let idx=p().unlockOrder.find(i=>!p().unlocked.includes(i));if(idx===undefined)return;p().unlocked.push(idx);queue.push({type:'country',idx});for(let c of new Set(countries.map(x=>x.continent))){let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0);if(ids.every(i=>p().unlocked.includes(i))&&!ids.every(i=>before.includes(i)))queue.push({type:'continent',name:c});}}
 function checkUnlocks(){let before=p().unlocked.slice();while(p().unlocked.length<countries.length&&p().totalStars>=threshold(p().unlocked.length)){let idx=p().unlockOrder.find(i=>!p().unlocked.includes(i));if(idx===undefined)break;p().unlocked.push(idx);queue.push({type:'country',idx});}
