@@ -108,7 +108,7 @@ const countries=[
 const rewards=[['📺 30 Min. Fernsehen',40],['🎮 30 Min. Spielen',60],['🍿 Film aussuchen',100]];
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const threshold=n=>n===0?100:n===1?250:n===2?450:450+(n-2)*250;
+const threshold=n=>n<10?(n+1)*50:n<30?500+(n-9)*75:n<60?2000+(n-29)*100:n<100?5000+(n-59)*125:10000+(n-99)*150;
 let db;try{db=JSON.parse(localStorage.getItem('english-world-v01')||'null')}catch(e){}db=db||{active:'Sohn',profiles:{}};
 function blank(){return {stars:0,totalStars:0,correct:0,streak:0,bestStreak:0,words:JSON.parse(JSON.stringify(defaultWords)),unlocked:[],redeemed:[],unlockOrder:shuffle(countries.map((_,i)=>i)),missed:[]}}
 if(!db.profiles.Sohn)db.profiles.Sohn=blank();if(!db.profiles.Test)db.profiles.Test=blank();
