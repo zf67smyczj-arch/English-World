@@ -13,7 +13,7 @@
 <body>
 <main class="app">
   <header class="top">
-    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.3</small></div><div class="sub" id="profileLabel"></div></div>
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.3.1</small></div><div class="sub" id="profileLabel"></div></div>
     <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
   </header>
 
@@ -145,17 +145,16 @@ reverse=false;let opts=[task==='gap'?current[0]:current[1]];
 for(let w of shuffle(p().words)){let v=task==='gap'?w[0]:w[1];if(opts.length>=4)break;if(!opts.includes(v))opts.push(v)}
 opts=shuffle(opts);window.choices=opts;
 if(task==='gap'){
-let sentence=gapSentence(current[0]);$('taskInstruction').textContent='Welches englische Wort fehlt im Satz?';
+let sentence=gapSentence(current[0],current[1]);$('taskInstruction').textContent='Welches englische Wort fehlt im Satz?';
 $('question').textContent=sentence;
 }else{$('taskInstruction').textContent='Wähle die richtige Übersetzung.';$('question').textContent=current[0]}
-$('answers').innerHTML=opts.map((x,i)=>'<button class="btn" onclick="submitChoice('+i+')+'">'+escapeHtml(x)+'</button>').join('');
+$('answers').innerHTML=opts.map((x,i)=>'<button class="btn" onclick="submitChoice('+i+')">'+escapeHtml(x)+'</button>').join('');
 }else{
 let target=reverse?current[0]:current[1],promptWord=reverse?current[1]:current[0];window.expected=target;
 $('taskInstruction').textContent='Schreibe die Übersetzung.';$('question').textContent=promptWord;
 $('answers').innerHTML='<form onsubmit="event.preventDefault();submitText()"><input class="field questionInput" id="typedAnswer" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Antwort schreiben" aria-label="Antwort"><button class="btn primary wide" type="submit">Prüfen</button></form>';
 }}
-const gapExamples={dog:'The ____ is barking.',cat:'The ____ is sleeping.',school:'I go to ____ every day.',friend:'My ____ is nice.',book:'I read a ____.',window:'Open the ____, please.',teacher:'The ____ is in the classroom.',breakfast:'I eat ____ in the morning.',garden:'We play in the ____.',family:'I love my ____.',Monday:'Today is ____.',yellow:'The sun is ____.',apple:'I eat an ____.',house:'This is my ____.',water:'I drink ____.',chair:'Sit on the ____.',table:'The book is on the ____.',sister:'My ____ is eight.',brother:'My ____ likes football.',morning:'Good ____!'};
-function gapSentence(word){return gapExamples[word.toLowerCase()]||'Translate into English: '+word+' → ____'}
+function gapSentence(word,german){return 'Englisch für „'+german+'“: ____';}
 
 function normalize(s){return String(s).toLocaleLowerCase('de').trim().replace(/[.!?]/g,'').replace(/\s+/g,' ')}
 function submitChoice(i){if(waiting)return;finish(window.choices[i]===(task==='gap'?current[0]:current[1]),task==='gap'?current[0]:current[1])}
