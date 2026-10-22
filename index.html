@@ -15,7 +15,7 @@
 <body>
 <main class="app">
   <header class="top">
-    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.5.6</small></div><div class="sub" id="profileLabel"></div></div>
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.5.7</small></div><div class="sub" id="profileLabel"></div></div>
     <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
   </header>
 
@@ -23,7 +23,7 @@
     <div style="display:flex;gap:8px;margin-bottom:9px"><button class="btn primary" id="mapTab" onclick="setCountryView('map')">🗺️ Karte</button><button class="btn" id="listTab" onclick="setCountryView('list')">📋 Liste</button></div><div id="allCountriesList" class="hidden" style="max-height:340px;overflow:auto;background:white;border-radius:16px;padding:10px;margin-bottom:12px"></div><div class="map" id="worldMap"><svg id="worldSvg" viewBox="0 0 800 330" preserveAspectRatio="xMidYMid meet" aria-label="Interaktive Weltkarte"></svg><div class="maplegend"><i></i> Entdeckt</div><div class="mapcontrols"><button onclick="zoomMap(-1)" aria-label="Verkleinern">−</button><button onclick="zoomMap(1)" aria-label="Vergrößern">+</button><button onclick="resetMap()" aria-label="Karte zurücksetzen">⌂</button><button onclick="toggleMapFullscreen()" aria-label="Vollbild">⛶</button></div><div class="mapnote" id="mapNote">🌍 Weltübersicht</div></div>
     <div class="card hero"><h2>Englisch trainieren</h2><p>10 Schulvokabeln: 5 auswählen, 2 schreiben, 3 Lückensätze. Richtige Antworten bringen Sterne.</p><button class="btn secondary wide" onclick="startRound()">Runde starten</button></div>
     <div class="card">
-      <div class="sectionTitle"><h2>🌍 Länder entdeckt</h2><b><span id="countryCount">0</span> / 20</b></div>
+      <div class="sectionTitle"><h2>🌍 Länder entdeckt</h2><b><span id="countryCount">0</span></b></div>
       <div class="progress" style="margin:12px 0"><i id="countryProgress"></i></div>
       <div class="small" id="nextCountry"></div>
     </div>
