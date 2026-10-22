@@ -229,7 +229,7 @@ $('roundLabel').textContent=(bonusRound?'⭐ Bonus · ':'')+(round+1)+' / '+roun
 let reverse=round%2===0;
 if(task==='choice'||task==='gap'){
 reverse=false;let opts=[task==='gap'?current[0]:current[1]];
-for(let w of shuffle(bonusRound?bonusWords:p().words)){let v=task==='gap'?w[0]:w[1];if(opts.length>=4)break;if(!opts.includes(v))opts.push(v)}
+for(let w of shuffle(bonusRound?roundWords:roundWords)){let v=task==='gap'?w[0]:w[1];if(opts.length>=4)break;if(!opts.includes(v))opts.push(v)}
 opts=shuffle(opts);window.choices=opts;
 if(task==='gap'){
 let sentence=gapSentence(current[0],current[1]);$('taskInstruction').textContent='Welches englische Wort fehlt im Satz?';
