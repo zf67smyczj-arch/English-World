@@ -13,7 +13,7 @@
 <body>
 <main class="app">
   <header class="top">
-    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.4.6</small></div><div class="sub" id="profileLabel"></div></div>
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.4.7</small></div><div class="sub" id="profileLabel"></div></div>
     <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
   </header>
 
@@ -45,7 +45,7 @@
 
   <section id="badges" class="hidden">
     <div class="card"><h2>🏆 Abzeichen</h2><div class="badges" id="badgeGrid"></div></div>
-    <div class="card"><h2>🎁 Belohnungen</h2><div id="rewardList"></div><p class="small">Zum Einlösen ist die Eltern-PIN erforderlich.</p></div>
+    
   </section>
 
   <section id="parents" class="hidden">
@@ -105,7 +105,7 @@ const countries=[
 {name:'Norwegen',en:'Norway',flag:'🇳🇴',iso:'578',capital:'Oslo',continent:'Europa',fact:'Norwegen ist berühmt für seine tiefen Fjorde.'},
 {name:'Griechenland',en:'Greece',flag:'🇬🇷',iso:'300',capital:'Athen',continent:'Europa',fact:'Die ersten antiken Olympischen Spiele fanden in Griechenland statt.'}
 ];
-const rewards=[['📺 30 Min. Fernsehen',40],['🎮 30 Min. Spielen',60],['🍿 Film aussuchen',100]];
+
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const threshold=n=>n<100?(n+1)*50:5000+(n-99)*60;
@@ -128,9 +128,28 @@ $('nextCountry').textContent=p().unlocked.length<countries.length?'Nächstes Üb
 $('countryGrid').innerHTML=p().unlocked.length?p().unlocked.map(i=>'<button class="country btn" onclick="countryInfo('+i+')"><span class="flag">'+countries[i].flag+'</span><b>'+countries[i].name+'</b><small>'+countries[i].en+'</small></button>').join(''):'<p class="small">Noch keine Länder entdeckt. Sammle Sterne!</p>';
 let continents=[...new Set(countries.map(c=>c.continent))];
 $('continentProgress').innerHTML=continents.map(c=>{let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0),got=ids.filter(i=>p().unlocked.includes(i)).length;return '<div class="continentRow"><b>'+c+'</b> <span class="small">'+got+' / '+ids.length+'</span><div class="progress"><i style="width:'+(got/ids.length*100)+'%"></i></div></div>'}).join('');
-let badges=[['⭐','Erste Schritte',p().correct>=10,'10 richtige Antworten'],['🔥','Drangeblieben',p().bestStreak>=10,'10 richtige in Folge'],['🌍','Entdecker',p().unlocked.length>=3,'3 Länder entdeckt'],['🏳️','Flaggensammler',p().unlocked.length>=10,'10 Länder entdeckt'],['📚','Wortprofi',p().correct>=100,'100 richtige Antworten'],['🏆','English Star',p().correct>=250,'250 richtige Antworten'],...continents.map(c=>{let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0);return ['🏆',c+'-Meister',ids.every(i=>p().unlocked.includes(i)),'Alle '+ids.length+' Länder entdeckt']})];
-$('badgeGrid').innerHTML=badges.map(b=>'<div class="medal '+(b[2]?'':'locked')+'"><span>'+b[0]+'</span><b>'+b[1]+'</b><br><small>'+b[3]+'</small></div>').join('');
-$('rewardList').innerHTML=rewards.map((r,i)=>'<div class="listItem"><div><b>'+r[0]+'</b><div class="small">'+r[1]+' ⭐</div></div><button class="btn" onclick="redeem('+i+')" '+(p().stars<r[1]?'disabled':'')+'>Einlösen</button></div>').join('');
+let badges=[
+['⭐','Erste Schritte',p().correct>=10,'10 richtige Antworten'],
+['🔥','Drangeblieben',p().bestStreak>=10,'10 richtige in Folge'],
+['🌍','Entdecker',p().unlocked.length>=3,'3 Länder entdeckt'],
+['🏳️','Flaggensammler',p().unlocked.length>=10,'10 Länder entdeckt'],
+['📚','Wortprofi',p().correct>=100,'100 richtige Antworten'],
+['🏆','English Star',p().correct>=250,'250 richtige Antworten'],
+['🎯','Treffsicher',p().correct>=25,'25 richtige Antworten'],
+['🚀','Aufsteiger',p().correct>=50,'50 richtige Antworten'],
+['🧠','Vokabelgenie',p().correct>=500,'500 richtige Antworten'],
+['💎','Wortmeister',p().correct>=1000,'1.000 richtige Antworten'],
+['⚡','Blitzserie',p().bestStreak>=20,'20 richtige in Folge'],
+['👑','Unaufhaltsam',p().bestStreak>=50,'50 richtige in Folge'],
+['🗺️','Weltenbummler',p().unlocked.length>=20,'20 Länder entdeckt'],
+['🧭','Großer Entdecker',p().unlocked.length>=50,'50 Länder entdeckt'],
+['🌐','Weltreisender',p().unlocked.length>=100,'100 Länder entdeckt'],
+['🌟','Sternensammler',p().totalStars>=500,'500 Sterne verdient'],
+['✨','Sternenprofi',p().totalStars>=2000,'2.000 Sterne verdient'],
+['🌠','Sternenlegende',p().totalStars>=5000,'5.000 Sterne verdient'],
+...continents.map(c=>{let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0);return ['🏆',c+'-Meister',ids.every(i=>p().unlocked.includes(i)),'Alle '+ids.length+' Länder entdeckt']})
+];
+$('badgeGrid').innerHTML=badges.map(b=>'<div class="medal '+(b[2]?'':'locked')+'"><span>'+(b[2]?b[0]:'🔒')+'</span><b>'+(b[2]?b[1]:'Verstecktes Abzeichen')+'</b><br><small>'+(b[2]?b[3]:'Spiele weiter, um es zu entdecken!')+'</small></div>').join('');
 $('profilebar').innerHTML=Object.keys(db.profiles).map((n,i)=>'<button class="profileBtn '+(n===db.active?'active':'')+'" onclick="switchProfileByIndex('+i+')">'+escapeHtml(n)+'</button>').join('');
 $('editProfile').textContent=db.active;
 $('wordList').innerHTML=p().words.map((w,i)=>'<div class="listItem"><span><b>'+escapeHtml(w[0])+'</b> – '+escapeHtml(w[1])+'</span><button class="btn" onclick="deleteWord('+i+')">×</button></div>').join('');
