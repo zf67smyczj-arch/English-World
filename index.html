@@ -13,7 +13,7 @@
 <body>
 <main class="app">
   <header class="top">
-    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.4.0</small></div><div class="sub" id="profileLabel"></div></div>
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.4.1</small></div><div class="sub" id="profileLabel"></div></div>
     <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
   </header>
 
@@ -113,7 +113,7 @@ function blank(){return {stars:0,totalStars:0,correct:0,streak:0,bestStreak:0,wo
 if(!db.profiles.Sohn)db.profiles.Sohn=blank();if(!db.profiles.Test)db.profiles.Test=blank();
 function migrate(q){q.unlocked=q.unlocked||[];q.words=q.words||JSON.parse(JSON.stringify(defaultWords));q.redeemed=q.redeemed||[];q.missed=q.missed||[];if(!q.unlockOrder){q.unlockOrder=[...q.unlocked,...shuffle(countries.map((_,i)=>i).filter(i=>!q.unlocked.includes(i)))];}q.unlockOrder=[...new Set([...q.unlocked,...q.unlockOrder,...countries.map((_,i)=>i)])];}
 Object.values(db.profiles).forEach(migrate);
-let round=0,current=null,roundWords=[],task='',waiting=false,queue=[],mapFeatures=null,roundRewardGiven=false,mapZoom=1.55,mapCenterX=420,mapCenterY=165,mapPointers=new Map(),mapGesture=false,mapStart=null;
+let round=0,current=null,roundWords=[],task='',waiting=false,queue=[],mapFeatures=null,roundRewardGiven=false,roundTasks=[],mapZoom=1.55,mapCenterX=420,mapCenterY=165,mapPointers=new Map(),mapGesture=false,mapStart=null;
 const p=()=>db.profiles[db.active];
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function save(){localStorage.setItem('english-world-v01',JSON.stringify(db));render()}
@@ -135,9 +135,9 @@ $('editProfile').textContent=db.active;
 $('wordList').innerHTML=p().words.map((w,i)=>'<div class="listItem"><span><b>'+escapeHtml(w[0])+'</b> – '+escapeHtml(w[1])+'</span><button class="btn" onclick="deleteWord('+i+')">×</button></div>').join('');
 drawMap();
 }
-function startRound(){round=0;roundRewardGiven=false;waiting=false;let missed=p().missed.map(i=>p().words[i]).filter(Boolean);roundWords=[...missed.slice(0,4),...shuffle(p().words).filter(w=>!missed.includes(w))].slice(0,10);if(roundWords.length<10)roundWords=[...roundWords,...shuffle(p().words).slice(0,10-roundWords.length)];roundWords=shuffle(roundWords);show('learn');nextWord()}
+function startRound(){round=0;roundRewardGiven=false;waiting=false;let missed=p().missed.map(i=>p().words[i]).filter(Boolean);roundWords=[...missed.slice(0,4),...shuffle(p().words).filter(w=>!missed.includes(w))].slice(0,10);if(roundWords.length<10)roundWords=[...roundWords,...shuffle(p().words).slice(0,10-roundWords.length)];roundWords=shuffle(roundWords);roundTasks=shuffle(['choice','choice','choice','choice','choice','write','write','gap','gap','gap']);show('learn');nextWord()}
 function nextWord(){waiting=false;if(round>=roundWords.length){if(db.active==='Test'&&!roundRewardGiven){roundRewardGiven=true;unlockTestCountry();save()}$('question').textContent='Runde geschafft!';$('answers').innerHTML='<button class="btn primary wide" onclick="show(\'home\')">Zur Weltkarte</button>';$('toast').textContent='🎉 Gut gemacht!';$('roundProgress').style.width='100%';if(queue.length)showModalQueue();return}
-current=roundWords[round];task=round<5?'choice':round<7?'write':'gap';
+current=roundWords[round];task=roundTasks[round]||'choice';
 $('roundLabel').textContent=(round+1)+' / '+roundWords.length;$('roundProgress').style.width=(round/roundWords.length*100)+'%';$('toast').textContent='';
 let reverse=round%2===0;
 if(task==='choice'||task==='gap'){
