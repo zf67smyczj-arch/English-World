@@ -140,9 +140,10 @@ const countries=[
 
 const $=id=>document.getElementById(id);
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function balancedCountryOrder(){let groups={};countries.forEach((c,i)=>(groups[c.continent]??=[]).push(i));Object.keys(groups).forEach(k=>groups[k]=shuffle(groups[k]));let order=[];while(order.length<countries.length){let available=Object.keys(groups).filter(k=>groups[k].length);if(!available.length)break;available.sort((a,b)=>order.filter(i=>countries[i].continent===a).length-order.filter(i=>countries[i].continent===b).length);order.push(groups[available[0]].pop())}return order}
 const threshold=n=>n<100?(n+1)*50:5000+(n-99)*60;
 let db;try{db=JSON.parse(localStorage.getItem('english-world-v01')||'null')}catch(e){}db=db||{active:'Sohn',profiles:{}};
-function blank(){return {stars:0,totalStars:0,correct:0,streak:0,bestStreak:0,words:JSON.parse(JSON.stringify(defaultWords)),unlocked:[],redeemed:[],unlockOrder:shuffle(countries.map((_,i)=>i)),missed:[]}}
+function blank(){return {stars:0,totalStars:0,correct:0,streak:0,bestStreak:0,words:JSON.parse(JSON.stringify(defaultWords)),unlocked:[],redeemed:[],unlockOrder:balancedCountryOrder(),missed:[]}}
 if(!db.profiles.Sohn)db.profiles.Sohn=blank();if(!db.profiles.Test)db.profiles.Test=blank();
 function migrate(q){q.unlocked=q.unlocked||[];q.words=q.words||JSON.parse(JSON.stringify(defaultWords));if(!q.wordExpansionV1){let seen=new Set(q.words.map(w=>w[0].toLocaleLowerCase('en')));for(let w of expansionWords){if(!seen.has(w[0].toLocaleLowerCase('en'))){q.words.push([...w]);seen.add(w[0].toLocaleLowerCase('en'))}}q.wordExpansionV1=true;}if(!q.wordExpansionV2){let seen=new Set(q.words.map(w=>w[0].toLowerCase()));for(let w of advancedWords){if(!seen.has(w[0].toLowerCase())){q.words.push([...w]);seen.add(w[0].toLowerCase())}}q.wordExpansionV2=true;}q.redeemed=q.redeemed||[];q.missed=q.missed||[];q.wordStats=q.wordStats||{};q.practiceRound=q.practiceRound||0;if(!q.unlockOrder){q.unlockOrder=[...q.unlocked,...shuffle(countries.map((_,i)=>i).filter(i=>!q.unlocked.includes(i)))];}q.unlockOrder=[...new Set([...q.unlocked,...q.unlockOrder,...countries.map((_,i)=>i)])];}
 Object.values(db.profiles).forEach(migrate);
