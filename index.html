@@ -15,13 +15,13 @@
 <body>
 <main class="app">
   <header class="top">
-    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.5.5</small></div><div class="sub" id="profileLabel"></div></div>
+    <div><div class="brand">🌍 English World <small style="font-size:11px">v0.5.6</small></div><div class="sub" id="profileLabel"></div></div>
     <div class="pills"><div class="pill">⭐ <span id="stars">0</span></div><div class="pill">🔥 <span id="streak">0</span></div></div>
   </header>
 
   <section id="home">
     <div style="display:flex;gap:8px;margin-bottom:9px"><button class="btn primary" id="mapTab" onclick="setCountryView('map')">🗺️ Karte</button><button class="btn" id="listTab" onclick="setCountryView('list')">📋 Liste</button></div><div id="allCountriesList" class="hidden" style="max-height:340px;overflow:auto;background:white;border-radius:16px;padding:10px;margin-bottom:12px"></div><div class="map" id="worldMap"><svg id="worldSvg" viewBox="0 0 800 330" preserveAspectRatio="xMidYMid meet" aria-label="Interaktive Weltkarte"></svg><div class="maplegend"><i></i> Entdeckt</div><div class="mapcontrols"><button onclick="zoomMap(-1)" aria-label="Verkleinern">−</button><button onclick="zoomMap(1)" aria-label="Vergrößern">+</button><button onclick="resetMap()" aria-label="Karte zurücksetzen">⌂</button><button onclick="toggleMapFullscreen()" aria-label="Vollbild">⛶</button></div><div class="mapnote" id="mapNote">🌍 Weltübersicht</div></div>
-    <div class="card hero"><h2>Englisch trainieren</h2><p>10 Schulvokabeln: 5 auswählen, 2 schreiben, 3 Lückensätze. Richtige Antworten bringen Sterne.</p><button class="btn secondary wide" onclick="startRound()">Runde starten</button><button class="btn wide hidden" id="testCountryBtn" style="margin-top:9px;background:#fff4c7" onclick="testUnlockNow()">🌍 Testland freischalten</button></div>
+    <div class="card hero"><h2>Englisch trainieren</h2><p>10 Schulvokabeln: 5 auswählen, 2 schreiben, 3 Lückensätze. Richtige Antworten bringen Sterne.</p><button class="btn secondary wide" onclick="startRound()">Runde starten</button></div>
     <div class="card">
       <div class="sectionTitle"><h2>🌍 Länder entdeckt</h2><b><span id="countryCount">0</span> / 20</b></div>
       <div class="progress" style="margin:12px 0"><i id="countryProgress"></i></div>
@@ -52,7 +52,7 @@
 
   <section id="parents" class="hidden">
     <div id="pinbox" class="card">
-      <h2>🔒 Elternbereich</h2><input class="field" id="pin" type="password" inputmode="numeric" placeholder="PIN – Testversion: 1234">
+      <h2>🔒 Elternbereich</h2><input class="field" id="pin" type="password" inputmode="numeric" placeholder="Eltern-PIN">
       <button class="btn primary wide" onclick="unlock()">Öffnen</button>
     </div>
     <div id="parentbox" class="hidden">
@@ -68,7 +68,7 @@
         <button class="btn wide" onclick="addWord()">+ Vokabel hinzufügen</button>
         <div id="wordList"></div>
       </div>
-      <div class="card"><h2>⚙️ Testwerkzeuge</h2><button class="btn" onclick="addTestStars()">+ 20 Teststerne</button> <button class="btn" onclick="resetProfile()">Profil zurücksetzen</button></div>
+      <div class="card"><h2>⚙️ Testwerkzeuge (nur Eltern)</h2><p class="small">Testfunktionen wirken ausschließlich auf das Testprofil.</p><button class="btn" onclick="addTestStars()">+ 20 Teststerne</button> <button class="btn" id="testCountryBtn" onclick="testUnlockNow()">🌍 Testland freischalten</button><button class="btn" onclick="resetProfile()">Profil zurücksetzen</button></div><button class="btn primary wide" onclick="leaveParents()">🔒 Elternbereich schließen und zu Ben wechseln</button>
     </div>
   </section>
 
@@ -146,16 +146,18 @@ function balancedCountryOrder(){let groups={};countries.forEach((c,i)=>(groups[c
 const threshold=n=>n<100?(n+1)*50:5000+(n-99)*60;
 let db;try{db=JSON.parse(localStorage.getItem('english-world-v01')||'null')}catch(e){}db=db||{active:'Ben',profiles:{}};
 function blank(){return {stars:0,totalStars:0,correct:0,streak:0,bestStreak:0,words:JSON.parse(JSON.stringify(defaultWords)),unlocked:[],redeemed:[],unlockOrder:balancedCountryOrder(),missed:[]}}
-if(db.profiles.Sohn&&!db.profiles.Ben){db.profiles.Ben=db.profiles.Sohn;delete db.profiles.Sohn}if(db.active==='Sohn')db.active='Ben';if(!db.profiles.Ben)db.profiles.Ben=blank();if(!db.profiles.Test)db.profiles.Test=blank();
+if(db.profiles.Sohn&&!db.profiles.Ben){db.profiles.Ben=db.profiles.Sohn;delete db.profiles.Sohn}if(db.active==='Sohn')db.active='Ben';if(!db.profiles.Ben)db.profiles.Ben=blank();if(!db.profiles.Test)db.profiles.Test=blank();db.active='Ben';
 function migrate(q){q.unlocked=q.unlocked||[];q.words=q.words||JSON.parse(JSON.stringify(defaultWords));if(!q.wordExpansionV1){let seen=new Set(q.words.map(w=>w[0].toLocaleLowerCase('en')));for(let w of expansionWords){if(!seen.has(w[0].toLocaleLowerCase('en'))){q.words.push([...w]);seen.add(w[0].toLocaleLowerCase('en'))}}q.wordExpansionV1=true;}if(!q.wordExpansionV2){let seen=new Set(q.words.map(w=>w[0].toLowerCase()));for(let w of advancedWords){if(!seen.has(w[0].toLowerCase())){q.words.push([...w]);seen.add(w[0].toLowerCase())}}q.wordExpansionV2=true;}q.redeemed=q.redeemed||[];q.missed=q.missed||[];q.wordStats=q.wordStats||{};q.practiceDays=q.practiceDays||0;q.learnDates=q.learnDates||[];q.rounds=q.rounds||0;q.bonusRounds=q.bonusRounds||0;q.perfectRounds=q.perfectRounds||0;q.typedCorrect=q.typedCorrect||0;q.gapCorrect=q.gapCorrect||0;q.choiceCorrect=q.choiceCorrect||0;q.uniqueCorrectWords=q.uniqueCorrectWords||[];q.uniqueCorrect=q.uniqueCorrectWords.length;q.practiceRound=q.practiceRound||0;if(!q.unlockOrder){q.unlockOrder=[...q.unlocked,...shuffle(countries.map((_,i)=>i).filter(i=>!q.unlocked.includes(i)))];}q.unlockOrder=[...new Set([...q.unlocked,...q.unlockOrder,...countries.map((_,i)=>i)])];}
 Object.values(db.profiles).forEach(migrate);
 let roundMistakes=0,round=0,current=null,roundWords=[],task='',waiting=false,queue=[],mapFeatures=null,roundRewardGiven=false,roundTasks=[],bonusRound=false,mapZoom=1.55,mapCenterX=420,mapCenterY=165,mapPointers=new Map(),mapGesture=false,mapStart=null;
 const p=()=>db.profiles[db.active];
 const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function save(){localStorage.setItem('english-world-v01',JSON.stringify(db));render()}
-function show(id){['home','learn','countries','badges','parents'].forEach(x=>$(x).classList.toggle('hidden',x!==id));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));let n=$('nav-'+id);if(n)n.classList.add('active');render()}
+let parentUnlocked=false;
+function leaveParents(){parentUnlocked=false;db.active='Ben';$('pin').value='';$('pinbox').classList.remove('hidden');$('parentbox').classList.add('hidden');save();show('home')}
+function show(id){if(id!=='parents'&&parentUnlocked)leaveParents();if(id==='parents'&&!parentUnlocked){$('pinbox').classList.remove('hidden');$('parentbox').classList.add('hidden')}['home','learn','countries','badges','parents'].forEach(x=>$(x).classList.toggle('hidden',x!==id));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));let n=$('nav-'+id);if(n)n.classList.add('active');render()}
 function render(){
-$('testCountryBtn').classList.toggle('hidden',db.active!=='Test');$('stars').textContent=p().stars;$('streak').textContent=p().streak;$('profileLabel').textContent='Profil: '+db.active;
+$('testCountryBtn').classList.toggle('hidden',db.active!=='Test'||!parentUnlocked);$('stars').textContent=p().stars;$('streak').textContent=p().streak;$('profileLabel').textContent='Profil: '+db.active;
 if(!$('allCountriesList').classList.contains('hidden'))renderAllCountriesList();$('countryCount').textContent=p().unlocked.length;$('countryCount2').textContent=p().unlocked.length+' / '+countries.length;
 $('countryProgress').style.width=(p().unlocked.length/countries.length*100)+'%';
 let next=threshold(p().unlocked.length),left=Math.max(0,next-p().totalStars);
@@ -218,7 +220,7 @@ function badgeInfo(i){let d=[['📚','Wortprofi','correct',[25,100,250],'richtig
 ['🌎','Weltkartenheld','unlocked',[10,30,50],'entdeckte Länder']][i];let lv=(p().badgeTiers||{})[d[1]]||0;if(!lv)return openModal('<div class="big">🔒</div><h2>Verstecktes Abzeichen</h2><p>Spiele weiter, um es zu entdecken!</p><button class="btn primary wide" onclick="closeModal()">Schließen</button>');let value=d[2]==='unlocked'?p().unlocked.length:p()[d[2]]||0;let progress=lv===3?100:Math.min(100,value/d[3][lv]*100);openModal('<div class="big">'+['','🥉','🥈','🥇'][lv]+'</div><h2>'+d[1]+'</h2><h3>'+['','Bronze','Silber','Gold'][lv]+'</h3><p>'+value+' '+d[4]+'</p><div class="progress"><i style="width:'+progress+'%"></i></div><p class="small">'+(lv===3?'Gold erreicht!':'Nächste Stufe: '+value+' / '+d[3][lv])+'</p><button class="btn primary wide" onclick="closeModal()">Schließen</button>')}
 function startRound(){roundMistakes=0;let today=new Date().toLocaleDateString('sv-SE');if(!p().learnDates.includes(today)){p().learnDates.push(today);p().practiceDays=p().learnDates.length;}round=0;roundRewardGiven=false;waiting=false;bonusRound=Math.random()<0.2;if(bonusRound){roundWords=shuffle(bonusWords).slice(0,5);roundTasks=shuffle(['choice','choice','choice','write','write']);show('learn');openModal('<div class="bonusBurst"><div class="bonusStars">✨🌟✨</div><h2>Überraschungs-Bonusrunde!</h2><p>5 etwas schwierigere Vokabeln warten auf dich!</p><div class="bonusPrize">5 ⭐ pro richtiger Antwort</div><p>Bis zu 25 Sterne gewinnen!</p><button class="btn primary wide" onclick="closeBonusIntro()">🚀 Los geht’s!</button></div>');return;}p().practiceRound=(p().practiceRound||0)+1;let pool=p().words.map((w,i)=>{let st=p().wordStats[w[0].toLowerCase()]||{right:0,wrong:0,last:0};let age=p().practiceRound-(st.last||0);let weight=(st.wrong>st.right?8:st.right===0?3:st.right===1?1.6:st.right===2?.8:.35)*(age>=5?1.5:1);if(st.last===p().practiceRound-1&&st.right>=st.wrong)weight*=.12;return {w,i,key:Math.pow(Math.random(),1/Math.max(.02,weight))}});roundWords=pool.sort((a,b)=>b.key-a.key).slice(0,10).map(x=>x.w);roundTasks=shuffle(['choice','choice','choice','choice','choice','write','write','gap','gap','gap']);show('learn');nextWord()}
 function closeBonusIntro(){$('overlay').classList.add('hidden');nextWord()}
-function nextWord(){waiting=false;if(round>=roundWords.length){p().rounds=(p().rounds||0)+1;if(bonusRound)p().bonusRounds=(p().bonusRounds||0)+1;if(roundMistakes===0)p().perfectRounds=(p().perfectRounds||0)+1;save();$('helpBtn').classList.add('hidden');$('helpInfo').textContent='';if(db.active==='Test'&&!bonusRound&&!roundRewardGiven){roundRewardGiven=true;unlockTestCountry();save()}$('question').textContent=bonusRound?'🎉 Bonusrunde geschafft!':'Runde geschafft!';$('answers').innerHTML='<button class="btn primary wide" onclick="show(\'home\')">Zur Weltkarte</button>';$('toast').textContent='🎉 Gut gemacht!';$('roundProgress').style.width='100%';if(queue.length)showModalQueue();return}
+function nextWord(){waiting=false;if(round>=roundWords.length){p().rounds=(p().rounds||0)+1;if(bonusRound)p().bonusRounds=(p().bonusRounds||0)+1;if(roundMistakes===0)p().perfectRounds=(p().perfectRounds||0)+1;save();$('helpBtn').classList.add('hidden');$('helpInfo').textContent='';if(db.active==='Test'&&parentUnlocked&&!bonusRound&&!roundRewardGiven){roundRewardGiven=true;unlockTestCountry();save()}$('question').textContent=bonusRound?'🎉 Bonusrunde geschafft!':'Runde geschafft!';$('answers').innerHTML='<button class="btn primary wide" onclick="show(\'home\')">Zur Weltkarte</button>';$('toast').textContent='🎉 Gut gemacht!';$('roundProgress').style.width='100%';if(queue.length)showModalQueue();return}
 current=roundWords[round];task=roundTasks[round]||'choice';$('taskInstruction').style.color=bonusRound?'#a56700':'';$('helpBtn').disabled=bonusRound||p().stars<2;$('helpBtn').classList.toggle('hidden',bonusRound);$('helpInfo').textContent='';
 $('roundLabel').textContent=(bonusRound?'⭐ Bonus · ':'')+(round+1)+' / '+roundWords.length;$('roundProgress').style.width=(round/roundWords.length*100)+'%';$('toast').textContent='';$('toast').className='toast';
 let reverse=round%2===0;
@@ -243,7 +245,7 @@ function useHelp(){if(bonusRound||waiting||p().stars<2||$('helpBtn').disabled)re
 function submitChoice(i){if(waiting)return;finish(window.choices[i]===(task==='gap'?current[0]:current[1]),task==='gap'?current[0]:current[1])}
 function submitText(){if(waiting)return;let v=$('typedAnswer').value.trim();if(!v)return;let accepted=window.expected.split('/').map(normalize);finish(accepted.includes(normalize(v)),window.expected)}
 function finish(right,expected){waiting=true;$('helpBtn').disabled=true;let idx=p().words.findIndex(w=>w[0]===current[0]&&w[1]===current[1]);if(!bonusRound&&idx>=0){let key=current[0].toLowerCase(),st=p().wordStats[key]||{right:0,wrong:0,last:0};if(right)st.right++;else st.wrong++;st.last=p().practiceRound;p().wordStats[key]=st;}if(right){if(!bonusRound&&idx>=0){let wordKey=current[0].toLowerCase();if(!p().uniqueCorrectWords.includes(wordKey))p().uniqueCorrectWords.push(wordKey);p().uniqueCorrect=p().uniqueCorrectWords.length;}let taskType=roundTasks[round]||'choice';if(taskType==='write')p().typedCorrect++;else if(taskType==='gap')p().gapCorrect++;else p().choiceCorrect++;let earned=bonusRound?5:2;p().stars+=earned;p().totalStars+=earned;p().correct++;p().streak++;p().bestStreak=Math.max(p().bestStreak,p().streak);p().missed=p().missed.filter(i=>i!==idx);$('toast').className='toast correct';$('toast').textContent='✔ Richtig · +'+earned+' ⭐'}else{roundMistakes++;p().streak=0;if(idx>=0&&!p().missed.includes(idx))p().missed.push(idx);$('toast').className='toast wrong';$('toast').innerHTML='❌ Falsch<span class="answer">Richtig: '+escapeHtml(expected)+'</span>'}round++;checkUnlocks();save();$('answers').querySelectorAll('button,input').forEach(b=>b.disabled=true);setTimeout(nextWord,right?1500:3200)}
-function testUnlockNow(){if(db.active!=='Test')return;let before=p().unlocked.length;unlockTestCountry();save();if(p().unlocked.length===before)alert('Alle Testländer sind bereits entdeckt.');else showModalQueue()}
+function testUnlockNow(){if(!parentUnlocked||db.active!=='Test')return;let before=p().unlocked.length;unlockTestCountry();save();if(p().unlocked.length===before)alert('Alle Testländer sind bereits entdeckt.');else showModalQueue()}
 function unlockTestCountry(){if(p().unlocked.length>=countries.length)return;let before=p().unlocked.slice();let idx=p().unlockOrder.find(i=>!p().unlocked.includes(i));if(idx===undefined)return;p().unlocked.push(idx);queue.push({type:'country',idx});for(let c of new Set(countries.map(x=>x.continent))){let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0);if(ids.every(i=>p().unlocked.includes(i))&&!ids.every(i=>before.includes(i)))queue.push({type:'continent',name:c});}}
 function checkUnlocks(){let before=p().unlocked.slice();while(p().unlocked.length<countries.length&&p().totalStars>=threshold(p().unlocked.length)){let idx=p().unlockOrder.find(i=>!p().unlocked.includes(i));if(idx===undefined)break;p().unlocked.push(idx);queue.push({type:'country',idx});}
 for(let c of new Set(countries.map(x=>x.continent))){let ids=countries.map((x,i)=>x.continent===c?i:-1).filter(i=>i>=0);if(ids.every(i=>p().unlocked.includes(i))&&!ids.every(i=>before.includes(i)))queue.push({type:'continent',name:c});}}
@@ -252,13 +254,13 @@ function showModalQueue(){if(!queue.length)return;let e=queue.shift();if(e.type=
 function openModal(content){$('modal').innerHTML=content;$('overlay').classList.remove('hidden')}
 function closeModal(){$('overlay').classList.add('hidden');drawMap();if(queue.length)showModalQueue()}
 function countryInfo(i){let c=countries[i];openModal('<div class="big">'+c.flag+'</div><h2>'+c.name+'</h2><p>'+c.en+'</p><p><b>Hauptstadt:</b> '+c.capital+'</p><p><b>Kontinent:</b> '+c.continent+'</p><p>💡 '+c.fact+'</p><button class="btn primary wide" onclick="closeModal()">Schließen</button>')}
-function unlock(){if($('pin').value==='1234'){$('pinbox').classList.add('hidden');$('parentbox').classList.remove('hidden');render()}else alert('PIN stimmt nicht.')}
-function switchProfileByIndex(i){db.active=Object.keys(db.profiles)[i];save()}
-function addProfile(){let n=$('newProfile').value.trim();if(!n||db.profiles[n])return;db.profiles[n]=blank();db.active=n;$('newProfile').value='';save()}
-function addWord(){let a=$('en').value.trim(),b=$('de').value.trim();if(!a||!b)return;p().words.push([a,b]);$('en').value=$('de').value='';save()}
-function deleteWord(i){if(p().words.length<=4)return alert('Mindestens 4 Vokabeln müssen bleiben.');p().words.splice(i,1);p().missed=[];save()}
-function addTestStars(){p().stars+=20;p().totalStars+=20;checkUnlocks();save();if(queue.length)showModalQueue()}
-function resetProfile(){if(confirm('Nur das Profil „'+db.active+'“ zurücksetzen?')){db.profiles[db.active]=blank();save()}}
+function unlock(){if($('pin').value==='1806'){parentUnlocked=true;$('pinbox').classList.add('hidden');$('parentbox').classList.remove('hidden');render()}else alert('PIN stimmt nicht.')}
+function switchProfileByIndex(i){if(!parentUnlocked)return;db.active=Object.keys(db.profiles)[i];save()}
+function addProfile(){if(!parentUnlocked)return;let n=$('newProfile').value.trim();if(!n||db.profiles[n])return;db.profiles[n]=blank();db.active=n;$('newProfile').value='';save()}
+function addWord(){if(!parentUnlocked)return;let a=$('en').value.trim(),b=$('de').value.trim();if(!a||!b)return;p().words.push([a,b]);$('en').value=$('de').value='';save()}
+function deleteWord(i){if(!parentUnlocked)return;if(p().words.length<=4)return alert('Mindestens 4 Vokabeln müssen bleiben.');p().words.splice(i,1);p().missed=[];save()}
+function addTestStars(){if(!parentUnlocked||db.active!=='Test')return alert('Bitte zuerst das Testprofil auswählen.');p().stars+=20;p().totalStars+=20;checkUnlocks();save();if(queue.length)showModalQueue()}
+function resetProfile(){if(!parentUnlocked)return;if(confirm('Nur das Profil „'+db.active+'“ zurücksetzen?')){db.profiles[db.active]=blank();save()}}
 function point(lon,lat){return [(lon+180)*800/360,(83-lat)*330/145]}
 function ringPath(ring){let out='',previous=null;for(let pt of ring){let xy=point(pt[0],pt[1]);if(previous&&Math.abs(xy[0]-previous[0])>400){out+=' ';previous=null;}out+=(previous?'L':'M')+xy[0].toFixed(1)+' '+xy[1].toFixed(1)+' ';previous=xy}return out+'Z'}
 function toggleMapFullscreen(){let el=$('worldMap');el.classList.toggle('fullscreen');document.body.style.overflow=el.classList.contains('fullscreen')?'hidden':'';applyMapZoom()}
